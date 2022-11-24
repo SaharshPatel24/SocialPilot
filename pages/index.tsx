@@ -1,8 +1,10 @@
 import type { NextPage } from 'next'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation';
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { useColorMode } from '@chakra-ui/color-mode'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   MoonIcon,
   SunIcon
@@ -10,7 +12,9 @@ import {
 import { IconButton } from '@chakra-ui/button'
 import { Box, Center, Flex, useColorModeValue, Text, Heading, Button, useToast } from '@chakra-ui/react'
 import { ethers } from 'ethers'
-import { formatDiagnosticsWithColorAndContext } from 'typescript'
+
+
+declare let window: any;
 
 const Home: NextPage = () => {
 
@@ -22,15 +26,15 @@ const Home: NextPage = () => {
 
   //hooks for connecting to wallet
   const [loading, setLoading] = useState<boolean>(true)
-  const [contract, setContract] = useState({})
   const [account, setAccount] = useState<null | string>(null)
 
   //hook for toasts
   const toast = useToast();
 
+  const router = useRouter();
 
   const web3Handler = async (): Promise<void> => {
-    if (!(window as any).ethereum) {
+    if (!window.ethereum) {
       toast({
         title: 'No MetaMask Found',
         description: "We've not found and crypto wallet in your browser.",
@@ -41,22 +45,28 @@ const Home: NextPage = () => {
       return;
     }
 
-    let accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+    let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     setAccount(accounts[0]);
 
-    (window as any).ethereum.on('chainChanged', () => {
+    window.ethereum.on('chainChanged', () => {
       window.location.reload();
     });
 
-    (window as any).ethereum.on('accountsChanged', async () => {
+    window.ethereum.on('accountsChanged', async () => {
       setLoading(true)
       web3Handler()
     });
 
-    const provider = new ethers.providers.Web3Provider((window as any).ethereum);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    const signer = provider.getSigner();
   }
+
+  useEffect(() => {
+    web3Handler();
+    if (account) {
+      router.push("/dashboard");
+    }
+  }, [account])
 
   return (
     <div className={styles.container}>
@@ -102,7 +112,9 @@ const Home: NextPage = () => {
               </Text>
               {account ?
                 <Box mt={10} textAlign="center">
-                  <Button size='lg' color={color} fontSize="2xl " fontWeight="extrabold" >{account.slice(0, 5) + '...' + account.slice(38, 42)}</Button>
+                  <Link href="/dashboard">
+                    <Button size='lg' color={color} fontSize="2xl " fontWeight="extrabold" >Go to Dashboard</Button>
+                  </Link>
                 </Box>
                 :
                 <Box mt={10} textAlign="center">
