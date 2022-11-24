@@ -1,6 +1,6 @@
 import type { NextPage } from 'next'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { useColorMode } from '@chakra-ui/color-mode'
@@ -64,7 +64,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     web3Handler();
     if (account) {
-      router.push("/dashboard");
+      router.push(`/dashboard/${account}`);
     }
   }, [account])
 
@@ -112,7 +112,7 @@ const Home: NextPage = () => {
               </Text>
               {account ?
                 <Box mt={10} textAlign="center">
-                  <Link href="/dashboard">
+                  <Link href={`/dashboard/${account}`}>
                     <Button size='lg' color={color} fontSize="2xl " fontWeight="extrabold" >Go to Dashboard</Button>
                   </Link>
                 </Box>
