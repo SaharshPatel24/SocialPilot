@@ -63,6 +63,7 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     web3Handler();
+
     if (account) {
       router.push(`/dashboard/${account}`);
     }
@@ -75,12 +76,8 @@ const Home: NextPage = () => {
         <meta name="description" content="social media application" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-
       <main>
-
         <Flex bgGradient={bg}>
-
           <Box w='20%' h='100vh'>
             <Text
               as="h1"
@@ -91,7 +88,6 @@ const Home: NextPage = () => {
               Social Pilot
             </Text>
           </Box>
-
           <Center mt={-5} w='60%' h='100vh' >
             <Flex color={color} flexDir="column">
               <Text
@@ -123,7 +119,6 @@ const Home: NextPage = () => {
               }
             </Flex>
           </Center>
-
           <Box w='17%' h='100vh'>
             <Flex flexDir="row-reverse">
               <IconButton mt={5} aria-label="Toggle Mode" onClick={toggleColorMode}>
@@ -131,9 +126,7 @@ const Home: NextPage = () => {
               </IconButton>
             </Flex>
           </Box>
-
         </Flex>
-
       </main>
     </div >
   )
