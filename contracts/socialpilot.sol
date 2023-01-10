@@ -1,48 +1,34 @@
-//SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+// SPDX-License-Identifier: UNLICENSED
+
+pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-contract Socialpilot is ERC721URIStorage {
-    uint256 public tokenCount;
-    uint256 public postCount;
-    mapping(uint256 => Post) public posts;
+contract SocialPilot {
+
+    event NewPost(
+        address indexed author,
+        uint256 timestamp,
+        string note,
+        string imageHash
+    );
 
     struct Post {
-        uint256 id;
-        string hash;
-        uint256 tipAmount;
-        address payable author;
+        address author;
+        uint256 timestamp;
+        string note;
+        string imageHash;
     }
 
-    event PostCreated(
-        uint256 id,
-        string hash,
-        uint256 tipAmount,
-        address payable author
-    );
+    Post[] posts;
 
-    event PostTipped(
-        uint256 id,
-        string hash,
-        uint256 tipAmount,
-        address payable author
-    );
-
-    constructor() ERC721("Socialpilot", "DAPP") {}
-
-    function uploadPost(string memory _postHash) external {
-        require(bytes(_postHash).length > 0, "Cannot pass an empty hash");
-        postCount++;
-        posts[postCount] = Post(postCount, _postHash, 0, payable(msg.sender));
+    function newPost(string memory _note, string memory _ipfsHash) external {
+        posts.push(Post(msg.sender, block.timestamp, _note, _ipfsHash));
+        emit NewPost(msg.sender, block.timestamp, _note, _ipfsHash);
     }
 
-    function getAllPosts() external view returns (Post[] memory _posts) {
-        _posts = new Post[](postCount);
-        for (uint256 i = 0; i < _posts.length; i++) {
-            _posts[i] = posts[i + 1];
-        }
+    function getAllPosts() external view returns (Post[] memory) {
+        return posts;
     }
+
 }

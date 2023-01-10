@@ -31,43 +31,31 @@ const Home: NextPage = () => {
   //hook for toasts
   const toast = useToast();
 
-  const router = useRouter();
-
-  const web3Handler = async (): Promise<void> => {
-    if (!window.ethereum) {
-      toast({
-        title: 'No MetaMask Found',
-        description: "We've not found and crypto wallet in your browser.",
-        status: 'error',
-        duration: 9000,
-        isClosable: true,
-      })
-      return;
+  const checkIsAuthenticated = async () => {
+    try {
+      const { ethereum } = window;
+      if (!ethereum) {
+        return toast({
+              title: 'No MetaMask Found',
+              description: "We've not found and crypto wallet in your browser.",
+              status: 'error',
+              duration: 9000,
+              isClosable: true,
+            });
+      }
+      const accounts = await ethereum.request({ method: "eth_accounts" });
+      if (accounts?.length) {
+        const account = accounts[0];
+        setAccount(account);
+      }
+    } catch (error) {
+      console.log(error);
     }
-
-    let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    setAccount(accounts[0]);
-
-    window.ethereum.on('chainChanged', () => {
-      window.location.reload();
-    });
-
-    window.ethereum.on('accountsChanged', async () => {
-      setLoading(true)
-      web3Handler()
-    });
-
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-  }
+  };
 
   useEffect(() => {
-    web3Handler();
-
-    if (account) {
-      router.push(`/dashboard/${account}`);
-    }
-  }, [account])
+    checkIsAuthenticated()
+  },[])
 
   return (
     <div className={styles.container}>
@@ -114,7 +102,7 @@ const Home: NextPage = () => {
                 </Box>
                 :
                 <Box mt={10} textAlign="center">
-                  <Button size='lg' color={color} fontSize="2xl " fontWeight="extrabold" onClick={web3Handler}>Connect Wallet</Button>
+                  <Button size='lg' color={color} fontSize="2xl " fontWeight="extrabold" onClick={checkIsAuthenticated}>Connect Wallet</Button>
                 </Box>
               }
             </Flex>
