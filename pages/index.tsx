@@ -1,6 +1,5 @@
 import type { NextPage } from 'next'
 import Link from 'next/link'
-import { useRouter } from 'next/router';
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { useColorMode } from '@chakra-ui/color-mode'
@@ -9,10 +8,10 @@ import {
   MoonIcon,
   SunIcon
 } from '@chakra-ui/icons';
+import Web3 from 'web3';
 import { IconButton } from '@chakra-ui/button'
 import { Box, Center, Flex, useColorModeValue, Text, Heading, Button, useToast } from '@chakra-ui/react'
-import { ethers } from 'ethers'
-
+import Navbar from '../components/navbar'
 
 declare let window: any;
 
@@ -26,36 +25,27 @@ const Home: NextPage = () => {
 
   //hooks for connecting to wallet
   const [loading, setLoading] = useState<boolean>(true)
-  const [account, setAccount] = useState<null | string>(null)
+  const [account, setAccount] = useState<null | string[]>(null)
 
   //hook for toasts
   const toast = useToast();
 
   const checkIsAuthenticated = async () => {
-    try {
-      const { ethereum } = window;
-      if (!ethereum) {
-        return toast({
-              title: 'No MetaMask Found',
-              description: "We've not found and crypto wallet in your browser.",
-              status: 'error',
-              duration: 9000,
-              isClosable: true,
-            });
-      }
-      const accounts = await ethereum.request({ method: "eth_accounts" });
-      if (accounts?.length) {
-        const account = accounts[0];
-        setAccount(account);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
+      const web3 = new Web3(window.ethereum || window.web3.currentProvider)
 
-  useEffect(() => {
-    checkIsAuthenticated()
-  },[])
+      try {
+          await window.ethereum.enable()
+          const accounts = await web3.eth.getAccounts()
+          setAccount(accounts);
+          setLoading(false);
+      } catch (error) {
+          console.error(error)
+      }
+  } else {
+      toast({title: "Wallet Not Found"})
+  }
+  };
 
   return (
     <div className={styles.container}>
