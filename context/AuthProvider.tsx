@@ -4,6 +4,7 @@ import Web3 from 'web3';
 type AuthContextType = {
   isAuthenticated: boolean;
   account: string | null;
+  error: string | null;
   login: () => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -11,6 +12,7 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   account: null,
+  error: null,
   login: async () => {},
   logout: async () => {},
 });
@@ -22,6 +24,8 @@ type AuthProviderProps = {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [account, setAccount] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   let web3: any;
 
   const login = async () => {
@@ -44,7 +48,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     (async function(window: any) {
-      web3 = new Web3(window.ethereum);
+      if (typeof window.ethereum !== 'undefined') {
+        web3 = new Web3(window.ethereum);
+      } else {
+        setError("No Wallet Found")
+      }
     })(window)
 
     const interval = setInterval(async () => {
@@ -59,7 +67,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [isAuthenticated]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, account, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, account, error, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

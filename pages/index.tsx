@@ -17,10 +17,19 @@ const Home: NextPage = () => {
 
   const router = useRouter();
   
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, login, error } = useAuth();
 
   const handleLogin = async () => {
+    if(!error){
       await login();
+    } else {
+      toast({
+        title: error,
+        status: 'error',
+        duration: 6000,
+        isClosable: true,
+      })
+    }
   };
 
   return (
