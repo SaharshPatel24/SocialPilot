@@ -3,11 +3,13 @@ import React, { useEffect, useState } from 'react'
 import Web3 from 'web3';
 import { Box, useToast, chakra, Icon, useColorModeValue, Image } from '@chakra-ui/react'
 import { useRouter } from 'next/router';
+import { useAuth } from '../context/AuthProvider';
+import Dashboard from './dashboard/account';
+import { title } from 'process';
 
 declare let window: any;
 
 const Home: NextPage = () => {
-
   const bg = useColorModeValue("white", "gray.800");
 
   //hook for toasts
@@ -15,34 +17,16 @@ const Home: NextPage = () => {
 
   const router = useRouter();
   
-  const checkIsAuthenticated = async () => {
-    if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
-      const web3 = new Web3(window.ethereum || window.web3.currentProvider)
+  const { isAuthenticated, login } = useAuth();
 
-      try {
-          await window.ethereum.enable()
-          const accounts = await web3.eth.getAccounts()
-          return accounts;
-      } catch (error) {
-          console.error(error)
-      }
-    } 
+  const handleLogin = async () => {
+      await login();
   };
 
-  const onClickHandler = async() => {
-    const account = await checkIsAuthenticated();
-    if (account){
-      router.push({
-        pathname: '/dashboard/account',
-        query: { account: account },
-      });
-    }
-    else {
-      toast({title: "Wallet Not Found"})
-    }
-  }
-
   return (
+    isAuthenticated ?
+    <Dashboard></Dashboard>
+    :
     <Box pos="relative" overflow="hidden" bg={bg} mt={10}>
       <Box maxW="7xl" mx="auto">
         <Box
@@ -208,7 +192,7 @@ const Home: NextPage = () => {
                       md: 4,
                     }}
                     cursor="pointer"
-                    onClick={onClickHandler}
+                    onClick={handleLogin}
                   >
                     Connect Wallet
                   </chakra.a>

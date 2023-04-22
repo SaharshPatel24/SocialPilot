@@ -3,9 +3,9 @@ import { Avatar, Box, Drawer, DrawerContent, DrawerOverlay, Flex, Icon, IconButt
 import { HamburgerIcon, SearchIcon } from '@chakra-ui/icons'
 import { useEffect, useState } from 'react'
 import { storeFiles, retrieveFiles } from '../../helpers/web3storage'
-import { ethers } from 'ethers'
 import { ABI } from '../../constants/abi-constant'
 import Web3 from 'web3'
+import { useAuth } from '../../context/AuthProvider'
 
 declare let window: any;
 
@@ -15,6 +15,11 @@ const Dashboard: NextPage = () => {
   const [description, setDescription] = useState<string>();
   const [selectedFile, setSelectedFile] = useState<{imageBlob: string, fileDetails: Record<never,string>}>();
   const [preview, setPreview] = useState<boolean>(false);
+  const { logout } = useAuth();
+
+  const handleLogout = async() => {
+    await logout();
+  }
 
   const toast = useToast();
 
@@ -235,6 +240,7 @@ const Dashboard: NextPage = () => {
               name="anubra266"
               src="https://avatars.githubusercontent.com/u/30869823?v=4"
               cursor="pointer"
+              onClick={handleLogout}
             />
           </Flex>
           <TabPanels>
