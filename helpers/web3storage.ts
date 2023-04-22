@@ -4,12 +4,11 @@ const makeStorageClient = () => {
   return new Web3Storage({ token: process.env.NEXT_PUBLIC_WEB3_STORAGE! })
 }
 
-const storeFiles = async (fileInput: any, note: string) => {
+const storeFiles = async (fileInput: any) => {
     const client = makeStorageClient();
-    console.log(note)
 
-    const rootCid = await client.put((fileInput as any).files, {
-        name: note,
+    const rootCid = await client.put(fileInput, {
+        name: Date(),
         maxRetries: 3
     });
 
@@ -18,12 +17,16 @@ const storeFiles = async (fileInput: any, note: string) => {
 }
 
 async function retrieveFiles (cid : string) {
-    const client = makeStorageClient()
-    const res = await client.get(cid) as Web3Response
-    const files = await res.files();
-    const url = URL.createObjectURL(files[0]);
-    console.log(url)
-    return url
+    try {
+        const client = makeStorageClient()
+        const res = await client.get(cid) as Web3Response
+        const files = await res.files();
+        const url = URL.createObjectURL(files[0]);
+        return url
+    } catch (error) {
+        console.log(error)
+    }
+    
 }
 
 export {

@@ -1,4 +1,5 @@
 import { ethers } from "hardhat";
+
 const main = async () => {
     const [deployer] = await ethers.getSigners();
     const accountBalance = await deployer.getBalance();
