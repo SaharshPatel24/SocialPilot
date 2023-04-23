@@ -16,7 +16,7 @@ const storeFiles = async (fileInput: any) => {
     return rootCid;
 }
 
-async function retrieveFiles (cid : string) {
+const retrieveFiles = async(cid : string): Promise<string | null> => {
     try {
         const client = makeStorageClient()
         const res = await client.get(cid) as Web3Response
@@ -25,6 +25,7 @@ async function retrieveFiles (cid : string) {
         return url
     } catch (error) {
         console.log(error)
+        return null;
     }
     
 }
